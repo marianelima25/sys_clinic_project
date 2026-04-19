@@ -1,2 +1,3 @@
 # sys_clinic_project
-Project integrating Python and Database proposed at my college.  It has loops, conditions, validations, and a direct connection to the database.
+Projeto desenvolvido para avaliação da matéria Programação Orientada a Objetos do curso de Sistemas de Informação.
+Integrando o Python com Banco de Dados MySQL, construindo assim um sistema completo de uma Clínica Médica, com loops, condições, menu e listagens organizadas.
