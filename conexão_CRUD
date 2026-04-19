@@ -1,0 +1,548 @@
+# -> PROJETO 2° FASE
+# -> Aluna= Mariane de Moraes Lima
+# -> Curso= Sistemas de Informação - UniFacisa
+
+
+# - - - -> CONEXÃO COM O BANCO
+
+import mysql.connector
+
+def connectar():
+    try:
+        conexao = mysql.connector.connect(
+        host="127.0.0.1",
+        user= "root",
+        password= "#Marisql25",
+        port= "3306",
+        database= "db_sys_clinic"
+        )
+
+        print("\n---> Conexão efetuada com sucesso!\n")
+        return conexao
+
+    except Exception as ex:
+        print("Erro ao conectar:", ex)
+        return None
+
+conexao= connectar()
+
+# - - - -> CLIENTES/PACIENTES
+
+# --> INSERINDO CLIENTES AO BANCO
+def Inserir_Clientes(conexao,nome,telefone,email,inativo):
+
+    try:
+        cursor= conexao.cursor()
+        sql= "INSERT INTO tb_clientes (nome,telefone,email,inativo) VALUES (%s,%s,%s,%s)"
+        valores= (nome,telefone,email,inativo)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        print("Cliente adicionado com sucesso!")
+    except Exception as Erro:
+        conexao.rollback()
+        print(Erro)
+
+# --> ALTERAÇÃO DE DADOS DOS CLIENTES CADASTRADOS, CONFORME O DESEJADO
+def Alterar_Clientes(conexao, nome, telefone, email, inativo, id_cliente):
+    try:
+        cursor = conexao.cursor()
+        sql = """
+        UPDATE tb_clientes 
+        SET nome=%s, telefone=%s, email=%s, inativo=%s
+        WHERE id_cliente=%s
+        """
+        valores = (nome, telefone, email, inativo, id_cliente)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        if cursor.rowcount == 0:
+            print("Nenhum cliente encontrado com esse ID!")
+        else:
+            print("Cliente atualizado com sucesso!")
+    except Exception as erro:
+        conexao.rollback()
+        print(erro)
+
+# --> EXCLUSÃO DE CLIENTES CONFORME O DESEJADO
+def Excluir_Clientes(conexao, id_cliente):
+    try:
+        cursor = conexao.cursor()
+        sql = "DELETE FROM tb_clientes WHERE id_cliente=%s"
+        valores = (id_cliente,)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        if cursor.rowcount == 0:
+            print("Nenhum cliente encontrado com esse ID!")
+        else:
+            print("Cliente excluído com sucesso!")
+    except Exception as erro:
+        conexao.rollback()
+        print(erro)
+
+# --> LISTA DOS CLIENTES CADASTRADOS
+def Listar_Clientes(conexao):
+    try:
+        cursor = conexao.cursor()
+        sql = "SELECT * FROM tb_clientes"
+        cursor.execute(sql)
+        resultados = cursor.fetchall()
+
+# FORMATANDO A SAÍDA DA LISTA
+        print(f"{'ID':<5} {'Nome':<26} {'Telefone':<16} {'Email':<25}")
+        print("-" * 74)
+
+        for c in resultados:
+            print(f"{c[0]:<5} {c[1]:<26} {c[2]:<16} {c[3]:<25}")
+
+    except Exception as erro:
+        print(erro)
+
+
+# - - - -> MÉDICOS
+
+# --> INSERINDO MÉDICOS AO BANCO
+def Inserir_Medicos(conexao,nome,telefone,crm,especialidade):
+
+    try:
+        cursor= conexao.cursor()
+        sql= "INSERT INTO tb_medicos (nome,telefone,crm,especialidade) VALUES (%s,%s,%s,%s)"
+        valores= (nome,telefone,crm,especialidade)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        print("Médico Cadastrado com sucesso!")
+    except Exception as Erro:
+        conexao.rollback()
+        print(Erro)
+
+# --> ALTERAÇÃO DE DADOS DOS MÉDICOS CADASTRADOS, CONFORME O DESEJADO
+def Alterar_Medicos(conexao, nome, telefone, crm, especialidade, id_medico):
+    try:
+        cursor = conexao.cursor()
+        sql = """
+        UPDATE tb_medicos 
+        SET nome=%s, telefone=%s, crm=%s, especialidade=%s
+        WHERE id_medico=%s
+        """
+        valores = (nome, telefone, crm, especialidade, id_medico)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        print("Médico atualizado com sucesso!")
+    except Exception as erro:
+        conexao.rollback()
+        print(erro)
+
+# --> EXCLUINDO MÉDICOS, CONFORME O DESEJADO
+def Excluir_Medicos(conexao, id_medico):
+    try:
+        cursor = conexao.cursor()
+        sql = "DELETE FROM tb_medicos WHERE id_medico=%s"
+        valores = (id_medico,)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        if cursor.rowcount == 0:
+            print("Nenhum Médico encontrado com esse ID!")
+        else:
+            print("Médico excluído com sucesso!")
+    except Exception as erro:
+        conexao.rollback()
+        print(erro)
+
+# --> LISTA DE MÉDICOS CADASTRADOS
+def Listar_Medicos(conexao):
+    try:
+        cursor = conexao.cursor()
+        sql = "SELECT * FROM tb_medicos"
+        cursor.execute(sql)
+        resultados = cursor.fetchall()
+
+# FORMATANDO A SAÍDA DA LISTA
+        print(f"{'ID':<5} {'Nome':<26} {'Telefone':<15} {'CRM':<16} {'Especialidade':<20}")
+        print("-" * 90)
+
+        for m in resultados:
+            print(f"{m[0]:<5} {m[1]:<26} {m[2]:<15} {m[3]:<16} {m[4]:<20}")
+
+    except Exception as erro:
+        print(erro)
+
+
+# - - - -> AGENDAMENTOS
+
+# --> ADICIONANDO AGENDAMENTOS
+def Inserir_Agendamentos(conexao,id_cliente,id_medico,data_agendamento,hora_agendamento,observacao,status_agendamento):
+
+    try:
+        cursor= conexao.cursor()
+        sql= """
+        INSERT INTO tb_agendamentos (id_cliente,id_medico,data_agendamento,
+        hora_agendamento,observacao,status_agendamento) VALUES (%s,%s,%s,%s,%s,%s)
+        """
+        valores= (id_cliente,id_medico,data_agendamento,hora_agendamento,observacao,status_agendamento)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        print("Agendamento realizado com sucesso! Esperamos por você!")
+    except Exception as Erro:
+        conexao.rollback()
+        print(Erro)
+
+# --> ALTERAÇÃO DOS AGENDAMENTOS CADASTRADOS, CONFORME O DESEJADO
+def Alterar_Agendamentos(conexao,id_agendamento,id_cliente,id_medico,data_agendamento,hora_agendamento,observacao,status_agendamento):
+    try:
+        cursor = conexao.cursor()
+        sql = """
+        UPDATE tb_agendamentos 
+        SET id_cliente=%s, id_medico=%s, data_agendamento=%s,
+        hora_agendamento=%s, observacao=%s, status_agendamento=%s
+        WHERE id_agendamento=%s
+        """
+        valores = (id_cliente,id_medico,data_agendamento,hora_agendamento,observacao,status_agendamento,id_agendamento)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        print("Agendamento atualizado com sucesso!")
+    except Exception as erro:
+        conexao.rollback()
+        print(erro)
+
+# --> CANCELAMENTO DE AGENDAMENTOS, CONFORME O DESEJADO
+def Cancelar_Agendamento(conexao, id_agendamento):
+    try:
+        cursor = conexao.cursor()
+        sql = "DELETE FROM tb_agendamentos WHERE id_agendamento=%s"
+        valores = (id_agendamento,)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        print("Agendamento cancelado com sucesso!")
+    except Exception as erro:
+        conexao.rollback()
+        print(erro)
+
+# --> LISTA DOS AGENDAMENTOS CADASTRADOS
+def Listar_Agendamentos(conexao):
+    try:
+        cursor = conexao.cursor()
+        sql = "SELECT * FROM tb_agendamentos"
+        cursor.execute(sql)
+        resultados = cursor.fetchall()
+
+# FORMATANDO A SAÍDA DA LISTA
+        print(f"{'ID':<5} {'Cliente':<10} {'Médico':<10} {'Data':<12} {'Hora':<13} {'Observação':<12}")
+        print("-" * 70)
+
+        for a in resultados:
+            print(f"{a[0]:<5} {a[1]:<10} {a[2]:<10} {str(a[3]):<12} {str(a[4]):<13} {a[5] or "":<12}")
+
+    except Exception as erro:
+        print(erro)
+
+
+# - - - -> VALIDAÇÕES
+
+def ler_int(msg): # NÃO PERMITIR LETRAS
+    while True:
+        try:
+            valor = int(input(msg))
+            if valor > 0:
+                return valor
+            else:
+                print("Digite um número correspondente!")
+        except ValueError:
+            print("Digite apenas números!")
+
+def ler_texto(msg): # NÃO PERMITIR NÚMEROS
+    while True:
+        texto = input(msg).strip()
+
+        if not texto:
+            print("Campo Obrigatório!")
+        elif any(char.isdigit() for char in texto):
+            print("O nome não pode conter números!")
+        else:
+            return texto
+
+def ler_telefone(msg): # GARANTIR UM FORMATO CORRETO PARA O TELEFONE INSERIDO
+    while True:
+        tel = input(msg)
+
+        telefone_format = tel
+        telefone_format = telefone_format.replace(" ", "")
+        telefone_format = telefone_format.replace("-", "")
+        telefone_format = telefone_format.replace("(", "")
+        telefone_format = telefone_format.replace(")", "")
+
+        if telefone_format.isdigit():
+            return tel
+        else:
+            print("Digite um telefone válido!")
+
+def ler_email(msg): # GARANTIR UM EMAIL CORRETO
+    while True:
+        email = input(msg)
+        if "@" in email and "." in email:
+            return email
+        else:
+            print("Digite um email válido!")
+
+def ler_opcao(msg, opcoes): # GARANTIR RESPOSTAS CORRESPONDENTES COM 0/1 PARA A INATIVIDADE
+    while True:
+        valor = input(msg)
+        if valor in opcoes:
+            return valor
+        else:
+            print(f"Digite apenas: {', '.join(opcoes)}")
+
+def ler_crm(msg): # GARANTIR O CRM, E O FORMATO CORRETO PARA ELE
+    while True:
+        crm = input(msg).strip()
+
+        if not crm:
+            print("Campo Obrigatório!")
+        elif not crm.startswith("CRM/") or len(crm) < 10:
+            print("Digite um CRM válido (CRM/UF 000000)")
+        else:
+            return crm
+
+def ler_obs(msg):
+    obs = input(msg).strip()
+    return obs if obs else None
+
+def ler_id(conexao, msg, tabela, campo):
+        while True:
+            try:
+                valor = int(input(msg))
+                if valor <= 0:
+                    print("Digite um ID válido (número positivo)!")
+                    continue
+                cursor = conexao.cursor()
+                sql = f"SELECT 1 FROM {tabela} WHERE {campo}=%s"
+                cursor.execute(sql, (valor,))
+
+                if cursor.fetchone():
+                    return valor
+                else:
+                    print("ID não encontrado!")
+
+            except ValueError:
+                print("Digite apenas números!")
+
+from datetime import datetime, time
+
+def ler_data(msg): # GARANTIR UMA DATA VÁLIDA E NO FORMATO CORRETO
+    while True:
+        data = input(msg)
+        try:
+            data_formatada = datetime.strptime(data, '%Y/%m/%d')
+            hoje = datetime.now()
+
+            if data_formatada.date() < hoje.date():
+                print("Não é possível agendar com essa data! Insira uma data correta no formato AAAA/MM/DD.")
+                continue
+            return data_formatada
+
+        except ValueError:
+            print("Digite uma data válida no formato AAAA/MM/DD!")
+
+def ler_hora(msg):  # GARANTIR UM HORÁRIO NO FORMATO CORRETO
+    while True:
+        hora = input(msg)
+        try:
+            hora_formatada = datetime.strptime(hora, "%H:%M").time()
+            abertura = time(8, 0)
+            fechamento = time(18, 0)
+
+            if not (abertura <= hora_formatada <= fechamento):
+                print("Horário fora do funcionamento da clínica (08:00 às 18:00)!")
+                continue
+            return hora_formatada
+
+        except ValueError:
+            print("Digite um horário com um formato válido! (00:00)")
+
+
+# - - - -> MENU DE INTERAÇÃO
+def menu():
+    print("~"*70)
+    print("SEJA BEM VINDO(A) A SYS CLINIC!".center(70))
+    print("~"*70)
+    while True:
+        print("\n- - - -  MENU  - - - -\n")
+        print("1 - Clientes")
+        print("2 - Médicos")
+        print("3 - Agendamentos")
+        print("4 - Sair\n")
+
+        opcao = input("Escolha: ")
+
+# - - - -> MENU DE CLIENTES
+        if opcao == "1":
+            while True:
+                print("\n- - - -> CLIENTES\n")
+                print("1 - Inserir")
+                print("2 - Alterar")
+                print("3 - Excluir")
+                print("4 - Listar")
+                print("5 - Voltar ao menu\n")
+
+                escolha = input("Escolha: ")
+
+                if escolha == "1": # CADASTRANDO CLIENTES
+                    nome = ler_texto("Nome: ")
+                    telefone = ler_telefone("Telefone: ")
+                    email = ler_email("Email: ")
+                    inativo = ler_opcao("Inativo 0(não) ou 1(sim): ", ["0", "1"])
+
+                    Inserir_Clientes(conexao, nome, telefone, email, inativo)
+
+                elif escolha == "2": # ALTERANDO INFORMAÇÕES
+
+                        id_cliente = ler_id(conexao, "ID do cliente: ", "tb_clientes", "id_cliente")
+                        nome = ler_texto("Novo Nome: ")
+                        telefone = ler_telefone("Novo Telefone: ")
+                        email = ler_email("Novo Email: ")
+                        inativo = ler_opcao("Inativo 0(não) ou 1(sim): ", ["0", "1"])
+
+                        Alterar_Clientes(conexao, nome, telefone, email, inativo, id_cliente)
+
+                elif escolha == "3": # EXCLUINDO CLIENTES DO CADASTRO
+
+                    id_cliente = ler_id(conexao, "ID do cliente: ", "tb_clientes", "id_cliente")
+                    cursor = conexao.cursor()
+                    cursor.execute("SELECT * FROM tb_agendamentos WHERE id_cliente=%s", (id_cliente,))
+                    resultado = cursor.fetchone()
+
+                    if resultado:
+                        print("Não foi possível excluir! Cliente possui agendamentos.")
+                    else:
+                        Excluir_Clientes(conexao, id_cliente)
+
+                elif escolha == "4": # LISTANDO TODOS OS CLIENTES JÁ CADASTRADOS
+                    Listar_Clientes(conexao)
+
+                elif escolha == "5": # VOLTANDO PARA O MENU PRINCIPAL
+                    print("Voltando...")
+                    break
+                else:
+                    print("Insira um número correspondente à função desejada!")
+                    continue
+
+# ----> MENU DOS MÉDICOS
+        elif opcao == "2":
+            while True:
+                print("\n- - - -> MÉDICOS\n")
+                print("1 - Inserir")
+                print("2 - Alterar")
+                print("3 - Excluir")
+                print("4 - Listar")
+                print("5 - Voltar ao menu\n")
+
+                escolha = input("Escolha: ")
+
+                if escolha == "1": # CADASTRANDO MÉDICOS
+                    nome = ler_texto("Nome: ")
+                    telefone = ler_telefone("Telefone: ")
+                    crm = ler_crm("CRM: ")
+                    especialidade = ler_texto("Especialidade: ")
+
+                    Inserir_Medicos(conexao, nome, telefone, crm, especialidade)
+
+                elif escolha == "2": # ALTERANDO INFORMAÇÕES
+
+                        id_medico = ler_id(conexao, "ID do médico: ", "tb_medicos", "id_medico")
+                        nome = ler_texto("Novo Nome: ")
+                        telefone = ler_telefone("Novo Telefone: ")
+                        crm = ler_crm("Novo CRM: ")
+                        especialidade = ler_texto("Nova Especialidade: ")
+
+                        Alterar_Medicos(conexao, nome, telefone, crm, especialidade, id_medico)
+
+                elif escolha == "3": # EXCLUINDO MÉDICOS DO CADASTRO
+
+                        id_medico = ler_id(conexao, "ID do médico: ", "tb_medicos", "id_medico")
+
+                        cursor = conexao.cursor()
+                        cursor.execute("SELECT * FROM tb_agendamentos WHERE id_medico=%s", (id_medico,))
+                        resultado = cursor.fetchone()
+
+                        if resultado:
+                            print("Não foi possível cancelar! Médico possui agendamentos.")
+                        else:
+                            Excluir_Medicos(conexao, id_medico)
+
+                elif escolha == "4": # LISTANDO TODOS OS MÉDICOS JÁ CADASTRADOS
+                    Listar_Medicos(conexao)
+
+                elif escolha == "5": # VOLTANDO PARA O MENU PRINCIPAL
+                    print("Voltando...")
+                    break
+                else:
+                    print("Insira um número correspondente à função desejada!")
+                    continue
+
+
+# ----> MENU DOS AGENDAMENTOS
+        elif opcao == "3":
+            while True:
+                print("\n- - - -> AGENDAMENTOS\n")
+                print("1 - Inserir")
+                print("2 - Alterar")
+                print("3 - Excluir")
+                print("4 - Listar")
+                print("5 - Voltar ao menu\n")
+
+                escolha = input("Escolha: ")
+
+                if escolha == "1": # AGENDANDO
+
+                        id_cliente = ler_id(conexao, "ID do cliente: ", "tb_clientes", "id_cliente")
+                        id_medico = ler_id(conexao, "ID do médico: ", "tb_medicos", "id_medico")
+                        data = ler_data("Data (AAAA/MM/DD): ")
+                        print("Horário de funcionamento da clínica (08:00 às 18:00)!")
+                        hora = ler_hora("Hora (HH:MM): ")
+                        obs = ler_obs("Observação (Retorno/Preferencial/Outro - opcional): ")
+                        status = "Agendado"
+
+                        Inserir_Agendamentos(conexao, id_cliente, id_medico, data, hora, obs, status)
+
+                elif escolha == "2": # ALTERANDO INFORMAÇÕES DOS AGENDAMENTOS
+
+                        id_agendamento = ler_id(conexao, "ID do agendamento: ", "tb_agendamentos", "id_agendamento")
+                        id_cliente = ler_id(conexao, "ID do cliente: ", "tb_clientes", "id_cliente")
+                        id_medico = ler_id(conexao, "ID do médico: ", "tb_medicos", "id_medico")
+                        data = ler_data("Nova data (AAAA/MM/DD): ")
+                        print("Horário de funcionamento da clínica (08:00 às 18:00)!")
+                        hora = ler_hora("Nova hora (HH:MM): ")
+                        obs = ler_obs("Observação (Retorno/Preferencial/Outro - opcional): ")
+                        status = "Agendado"
+
+                        Alterar_Agendamentos(conexao, id_agendamento, id_cliente, id_medico, data, hora, obs, status)
+
+                elif escolha == "3": # CANCELANDO AGENDAMENTOS
+                    try:
+                        id_agendamento = ler_id(conexao, "ID do agendamento: ", "tb_agendamentos", "id_agendamento")
+                        Cancelar_Agendamento(conexao, id_agendamento)
+                    except ValueError:
+                        print("ID inválido!")
+
+                elif escolha == "4": # LISTANDO TODOS OS AGENDAMENTOS
+                    Listar_Agendamentos(conexao)
+
+                elif escolha == "5": # VOLTANDO PARA O MENU PRINCIPAL
+                    print("Voltando...")
+                    break
+                else:
+                    print("Insira um número correspondente à função desejada!")
+                    continue
+
+# ----> SAINDO DO SISTEMA
+
+        elif opcao == "4":
+            print("Saindo do sistema...")
+            conexao.close() # ENCERRANDO A CONEXÃO COM O BANCO DE DADOS
+            import time
+            time.sleep(3)
+            break
+
+        else:
+            print("Insira um número correspondente à função desejada!")
+            continue
+
+menu()
+
