@@ -12,8 +12,8 @@ def connectar():
         conexao = mysql.connector.connect(
         host="127.0.0.1",
         user= "root",
-        password= "#Marisql25",
-        port= "3306",
+        password= "#M********",
+        port= "****",
         database= "db_sys_clinic"
         )
 
